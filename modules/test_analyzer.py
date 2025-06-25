@@ -1,6 +1,10 @@
 import json
 import os
+import logging
 from typing import List, Dict, Any, Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def analyze_pytest_files(test_dir: str, diff: Dict[str, Any]) -> List[str]:
     """
@@ -14,32 +18,46 @@ def analyze_pytest_files(test_dir: str, diff: Dict[str, Any]) -> List[str]:
         for file in files:
             if file.endswith(".py"):
                 file_path = os.path.join(root, file)
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    for path in changed_paths:
-                        if path in content:
-                            affected.append(file_path)
-                            break
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        for path in changed_paths:
+                            if path in content:
+                                affected.append(file_path)
+                                break
+                except Exception as e:
+                    logger.error(f"Error reading {file_path}: {e}")
     return affected
+
+def _traverse_postman_items(items, changed_paths, affected):
+    for item in items:
+        if "item" in item:
+            # Folder, recurse
+            _traverse_postman_items(item["item"], changed_paths, affected)
+        else:
+            request = item.get("request", {})
+            url = request.get("url", {})
+            raw_path = url.get("raw", "")
+            for path in changed_paths:
+                if path in raw_path:
+                    affected.append(item.get("name", raw_path))
+                    break
 
 def analyze_postman_collection(collection_path: str, diff: Dict[str, Any]) -> List[str]:
     """
     Analyze a Postman collection to find requests impacted by API changes.
     Returns a list of affected request names.
     """
-    with open(collection_path, "r", encoding="utf-8") as f:
-        collection = json.load(f)
     affected = []
     changed_paths = set(diff.get("added_endpoints", []) + diff.get("removed_endpoints", []))
     changed_paths.update([c["path"] for c in diff.get("changed_endpoints", [])])
-    for item in collection.get("item", []):
-        request = item.get("request", {})
-        url = request.get("url", {})
-        raw_path = url.get("raw", "")
-        for path in changed_paths:
-            if path in raw_path:
-                affected.append(item.get("name", raw_path))
-                break
+    try:
+        with open(collection_path, "r", encoding="utf-8") as f:
+            collection = json.load(f)
+        items = collection.get("item", [])
+        _traverse_postman_items(items, changed_paths, affected)
+    except Exception as e:
+        logger.error(f"Error reading or parsing Postman collection {collection_path}: {e}")
     return affected
 
 def analyze_tests(test_type: str, test_path: str, diff: Dict[str, Any]) -> List[str]:
@@ -51,6 +69,7 @@ def analyze_tests(test_type: str, test_path: str, diff: Dict[str, Any]) -> List[
     elif test_type == "postman":
         return analyze_postman_collection(test_path, diff)
     else:
+        logger.error(f"Unknown test type: {test_type}")
         raise ValueError(f"Unknown test type: {test_type}")
 
 # Example usage:

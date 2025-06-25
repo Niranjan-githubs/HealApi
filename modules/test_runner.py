@@ -1,7 +1,11 @@
 import subprocess
 import json
 import os
+import logging
 from typing import Dict, Any, List, Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def run_pytest(test_dir: str, extra_args: Optional[List[str]] = None) -> Dict[str, Any]:
     """
@@ -10,21 +14,26 @@ def run_pytest(test_dir: str, extra_args: Optional[List[str]] = None) -> Dict[st
     cmd = ["pytest", test_dir, "--json-report", "--json-report-file=pytest_report.json"]
     if extra_args:
         cmd.extend(extra_args)
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    report_path = os.path.join(test_dir, "pytest_report.json")
-    if os.path.exists(report_path):
-        with open(report_path, "r") as f:
-            report = json.load(f)
-        os.remove(report_path)
-    else:
-        report = {"error": "pytest report not found", "stdout": result.stdout, "stderr": result.stderr}
-    return {
-        "type": "pytest",
-        "returncode": result.returncode,
-        "stdout": result.stdout,
-        "stderr": result.stderr,
-        "report": report
-    }
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        report_path = os.path.join(test_dir, "pytest_report.json")
+        if os.path.exists(report_path):
+            with open(report_path, "r") as f:
+                report = json.load(f)
+            os.remove(report_path)
+        else:
+            report = {"error": "pytest report not found", "stdout": result.stdout, "stderr": result.stderr}
+        logger.info(f"Pytest run completed for {test_dir}")
+        return {
+            "type": "pytest",
+            "returncode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "report": report
+        }
+    except Exception as e:
+        logger.error(f"Error running pytest for {test_dir}: {e}")
+        return {"type": "pytest", "error": str(e)}
 
 def run_newman(collection_path: str, environment_path: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -33,21 +42,26 @@ def run_newman(collection_path: str, environment_path: Optional[str] = None) -> 
     cmd = ["newman", "run", collection_path, "--reporters", "json", "--reporter-json-export", "newman_report.json"]
     if environment_path:
         cmd.extend(["--environment", environment_path])
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    report_path = "newman_report.json"
-    if os.path.exists(report_path):
-        with open(report_path, "r") as f:
-            report = json.load(f)
-        os.remove(report_path)
-    else:
-        report = {"error": "newman report not found", "stdout": result.stdout, "stderr": result.stderr}
-    return {
-        "type": "newman",
-        "returncode": result.returncode,
-        "stdout": result.stdout,
-        "stderr": result.stderr,
-        "report": report
-    }
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        report_path = "newman_report.json"
+        if os.path.exists(report_path):
+            with open(report_path, "r") as f:
+                report = json.load(f)
+            os.remove(report_path)
+        else:
+            report = {"error": "newman report not found", "stdout": result.stdout, "stderr": result.stderr}
+        logger.info(f"Newman run completed for {collection_path}")
+        return {
+            "type": "newman",
+            "returncode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "report": report
+        }
+    except Exception as e:
+        logger.error(f"Error running newman for {collection_path}: {e}")
+        return {"type": "newman", "error": str(e)}
 
 def run_tests(test_type: str, test_path: str, **kwargs) -> Dict[str, Any]:
     """
@@ -58,7 +72,8 @@ def run_tests(test_type: str, test_path: str, **kwargs) -> Dict[str, Any]:
     elif test_type == "postman":
         return run_newman(test_path, kwargs.get("environment_path"))
     else:
-        raise ValueError(f"Unknown test type: {test_type}")
+        logger.error(f"Unknown test type: {test_type}")
+        return {"error": f"Unknown test type: {test_type}"}
 
 # Example usage:
 if __name__ == "__main__":

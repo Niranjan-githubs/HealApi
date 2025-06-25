@@ -1,5 +1,9 @@
 import json
+import logging
 from typing import Dict, Any, Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def generate_report(diff: Dict[str, Any], healing: Dict[str, Any], test_results: Dict[str, Any], output_path: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -12,20 +16,27 @@ def generate_report(diff: Dict[str, Any], healing: Dict[str, Any], test_results:
         "test_results": test_results
     }
     if output_path:
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(report, f, indent=2)
+        try:
+            with open(output_path, "w", encoding="utf-8") as f:
+                json.dump(report, f, indent=2)
+            logger.info(f"Report written to {output_path}")
+        except Exception as e:
+            logger.error(f"Failed to write report to {output_path}: {e}")
     return report
 
 def print_report(report: Dict[str, Any]):
     """
     Print the report in a readable format.
     """
-    print("==== API Diff ====")
-    print(json.dumps(report.get("api_diff", {}), indent=2))
-    print("\n==== Healing Actions ====")
-    print(json.dumps(report.get("healing_actions", {}), indent=2))
-    print("\n==== Test Results ====")
-    print(json.dumps(report.get("test_results", {}), indent=2))
+    try:
+        print("==== API Diff ====")
+        print(json.dumps(report.get("api_diff", {}), indent=2))
+        print("\n==== Healing Actions ====")
+        print(json.dumps(report.get("healing_actions", {}), indent=2))
+        print("\n==== Test Results ====")
+        print(json.dumps(report.get("test_results", {}), indent=2))
+    except Exception as e:
+        logger.error(f"Error printing report: {e}")
 
 # Example usage:
 if __name__ == "__main__":

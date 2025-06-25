@@ -1,0 +1,33 @@
+{
+  "api_diff": {
+    "added_endpoints": [],
+    "removed_endpoints": [
+      "/users/login"
+    ],
+    "changed_endpoints": [
+      {
+        "path": "/users",
+        "old_methods": [
+          "post"
+        ],
+        "new_methods": [
+          "put"
+        ]
+      }
+    ]
+  },
+  "healing_actions": {
+    "healed_pytest_files": []
+  },
+  "test_results": {
+    "type": "pytest",
+    "returncode": 5,
+    "stdout": "============================= test session starts =============================\nplatform win32 -- Python 3.11.9, pytest-8.4.1, pluggy-1.6.0\nrootdir: C:\\Users\\niranjan.c\\Desktop\\healapi\nplugins: json-report-1.5.0, metadata-3.1.1\ncollected 0 items\n\n--------------------------------- JSON report ---------------------------------\nreport saved to: pytest_report.json\n============================ no tests ran in 0.05s ============================\n",
+    "stderr": "",
+    "report": {
+      "error": "pytest report not found",
+      "stdout": "============================= test session starts =============================\nplatform win32 -- Python 3.11.9, pytest-8.4.1, pluggy-1.6.0\nrootdir: C:\\Users\\niranjan.c\\Desktop\\healapi\nplugins: json-report-1.5.0, metadata-3.1.1\ncollected 0 items\n\n--------------------------------- JSON report ---------------------------------\nreport saved to: pytest_report.json\n============================ no tests ran in 0.05s ============================\n",
+      "stderr": ""
+    }
+  }
+}
