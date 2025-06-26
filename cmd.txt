@@ -1,0 +1,2 @@
+ python main.py --old-spec project/old_openapi.yaml --new-spec project/new_openapi.yaml --test-type postman 
+--test-path project/dummy_collection.json --env-path project/dummy_env.json --report-path pytest_report.json 
