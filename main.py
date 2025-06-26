@@ -3,6 +3,7 @@ import os
 import json
 import logging
 from modules import diff_engine, test_analyzer, healing_engine, test_runner, report_generator
+from modules import openapi_typo_linter
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -17,6 +18,22 @@ def main():
     parser.add_argument('--report-path', help='Path to save the final report (optional)')
     parser.add_argument('--llm-model', help='LLM model name for advanced healing (optional)')
     args = parser.parse_args()
+
+    # Typo linting step before diff
+    print("[0/5] Linting OpenAPI specs for typos...")
+    old_typos = openapi_typo_linter.find_typos_in_yaml(args.old_spec)
+    new_typos = openapi_typo_linter.find_typos_in_yaml(args.new_spec)
+    if old_typos or new_typos:
+        print("Possible typos found in OpenAPI specs:")
+        if old_typos:
+            print(f"- {args.old_spec}:")
+            for t in old_typos:
+                print(f"  {t['path']}: '{t['typo']}' -> '{t['suggestion']}'")
+        if new_typos:
+            print(f"- {args.new_spec}:")
+            for t in new_typos:
+                print(f"  {t['path']}: '{t['typo']}' -> '{t['suggestion']}'")
+        print("[WARNING] Typos detected. Please fix them for best results.")
 
     try:
         print("[1/5] Running OpenAPI diff engine...")

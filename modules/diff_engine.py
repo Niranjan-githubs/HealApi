@@ -20,37 +20,59 @@ def load_spec(path: str) -> Dict[str, Any]:
         logger.error(f"Failed to load spec from {path}: {e}")
         raise
 
-def diff_specs(old_spec: Dict[str, Any], new_spec: Dict[str, Any]) -> Dict[str, Any]:
-    """Compare two OpenAPI specs and return a diff."""
+def get_schema_properties(spec, path, method):
     try:
-        old_paths = set(old_spec.get('paths', {}).keys())
-        new_paths = set(new_spec.get('paths', {}).keys())
+        responses = spec['paths'][path][method].get('responses', {})
+        for code, resp in responses.items():
+            content = resp.get('content', {})
+            for ctype, cval in content.items():
+                schema = cval.get('schema', {})
+                if 'properties' in schema:
+                    return set(schema['properties'].keys())
+        return set()
+    except Exception:
+        return set()
 
-        added = new_paths - old_paths
-        removed = old_paths - new_paths
-        common = old_paths & new_paths
+def diff_specs(old_spec: Dict[str, Any], new_spec: Dict[str, Any]) -> Dict[str, Any]:
+    old_paths = set(old_spec.get('paths', {}).keys())
+    new_paths = set(new_spec.get('paths', {}).keys())
 
-        diff = {
-            'added_endpoints': list(added),
-            'removed_endpoints': list(removed),
-            'changed_endpoints': []
-        }
+    added = new_paths - old_paths
+    removed = old_paths - new_paths
+    common = old_paths & new_paths
 
-        # Optionally, compare methods and schemas for changed endpoints
-        for path in common:
-            old_methods = set(old_spec['paths'][path].keys())
-            new_methods = set(new_spec['paths'][path].keys())
-            if old_methods != new_methods:
-                diff['changed_endpoints'].append({
+    diff = {
+        'added_endpoints': list(added),
+        'removed_endpoints': list(removed),
+        'changed_endpoints': [],
+        'property_changes': []
+    }
+
+    for path in common:
+        old_methods = set(old_spec['paths'][path].keys())
+        new_methods = set(new_spec['paths'][path].keys())
+        method_changes = old_methods ^ new_methods
+        if method_changes:
+            diff['changed_endpoints'].append({
+                'path': path,
+                'old_methods': list(old_methods),
+                'new_methods': list(new_methods)
+            })
+        # Property-level diff for common methods
+        for method in old_methods & new_methods:
+            old_props = get_schema_properties(old_spec, path, method)
+            new_props = get_schema_properties(new_spec, path, method)
+            added_props = new_props - old_props
+            removed_props = old_props - new_props
+            if added_props or removed_props:
+                diff['property_changes'].append({
                     'path': path,
-                    'old_methods': list(old_methods),
-                    'new_methods': list(new_methods)
+                    'method': method,
+                    'added_properties': list(added_props),
+                    'removed_properties': list(removed_props)
                 })
-        logger.info("Diff computed between specs")
-        return diff
-    except Exception as e:
-        logger.error(f"Error during spec diff: {e}")
-        raise
+    logger.info("Diff computed between specs")
+    return diff
 
 # Example usage:
 if __name__ == "__main__":

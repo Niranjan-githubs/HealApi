@@ -1,11 +1,41 @@
 import json
 import re
 import logging
+import os
 from typing import List, Dict, Any, Optional
 from together import Together
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv is optional, but recommended
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Set Together API key and default model if not already set
+def _ensure_together_api_key_and_model(openai_model: Optional[str]) -> str:
+    if not os.environ.get("TOGETHER_API_KEY"):
+        logger.error("TOGETHER_API_KEY not set. Please create a .env file with TOGETHER_API_KEY=your-key or set it in your environment.")
+        raise RuntimeError("TOGETHER_API_KEY not set. Please create a .env file with TOGETHER_API_KEY=your-key or set it in your environment.")
+    if not openai_model:
+        openai_model = "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
+        logger.info("Set Together model to meta-llama/Llama-3.3-70B-Instruct-Turbo-Free by default.")
+    return openai_model
+
+def _extract_json_from_llm_response(response_text: str) -> str:
+    """
+    Extract the first JSON code block from an LLM response (markdown or plain).
+    """
+    # Try to find a ```json ... ``` code block
+    match = re.search(r"```json\s*([\s\S]+?)```", response_text, re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+    # Fallback: try to find any {...} block at the start of a line
+    match = re.search(r"(\{[\s\S]+\})", response_text)
+    if match:
+        return match.group(1).strip()
+    return response_text.strip()
 
 def heal_pytest_files(affected_files: List[str], diff: Dict[str, Any], openapi_new: Dict[str, Any], openai_model: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -13,6 +43,7 @@ def heal_pytest_files(affected_files: List[str], diff: Dict[str, Any], openapi_n
     Uses LLM (Together API) if simple rules can't fix.
     Returns a dict with healing actions.
     """
+    openai_model = _ensure_together_api_key_and_model(openai_model)
     actions = []
     for file_path in affected_files:
         try:
@@ -66,6 +97,7 @@ def heal_postman_collection(collection_path: str, diff: Dict[str, Any], openapi_
     Uses LLM (Together API) if simple rules can't fix.
     Returns a dict with healing actions.
     """
+    openai_model = _ensure_together_api_key_and_model(openai_model)
     actions = []
     changed = False
     try:
@@ -75,18 +107,29 @@ def heal_postman_collection(collection_path: str, diff: Dict[str, Any], openapi_
             request = item.get("request", {})
             url = request.get("url", {})
             raw_path = url.get("raw", "")
-            for change in diff.get("changed_endpoints", []):
-                old_path = change["path"]
-                if old_path in raw_path:
-                    # Example: update method if changed
-                    if "old_methods" in change and "new_methods" in change:
-                        if request.get("method", "").upper() in [m.upper() for m in change["old_methods"]]:
-                            request["method"] = change["new_methods"][0].upper()
+            # Patch for property changes
+            for prop_change in diff.get("property_changes", []):
+                if prop_change['path'] in raw_path and request.get("method", "").lower() == prop_change['method']:
+                    # Patch request body for removed/added properties
+                    if request.get('body', {}).get('mode') == 'raw':
+                        try:
+                            body_json = json.loads(request['body']['raw'])
+                            # Remove properties that were removed
+                            for prop in prop_change['removed_properties']:
+                                if prop in body_json:
+                                    del body_json[prop]
+                            # Add properties that were added (with dummy value)
+                            for prop in prop_change['added_properties']:
+                                body_json[prop] = "<patched>"
+                            request['body']['raw'] = json.dumps(body_json)
                             changed = True
-                            actions.append({"request": item.get("name", raw_path), "action": "patched-method"})
+                            actions.append({"request": item.get("name", raw_path), "action": "patched-properties"})
+                        except Exception as e:
+                            actions.append({"request": item.get("name", raw_path), "action": "property-patch-failed", "error": str(e)})
+                    # You can also patch test scripts/assertions here if needed
             # If new required property in schema, use LLM to suggest fix
             if openai_model and not changed:
-                prompt = f"""The following Postman request is broken due to these OpenAPI changes: {json.dumps(diff)}\nHere is the request JSON:\n{json.dumps(request)}\nHere is the new OpenAPI schema:\n{json.dumps(openapi_new)}\nPlease suggest a fixed version that will pass with the new API spec."""
+                prompt = f"""The following Postman request is broken due to these OpenAPI changes: {json.dumps(diff)}\nHere is the request JSON:\n{json.dumps(request)}\nHere is the new OpenAPI schema:\n{json.dumps(openapi_new)}\nPlease suggest a fixed version that will pass with the new API spec. Only output the fixed request as a JSON object, no explanation."""
                 try:
                     client = Together()
                     response = client.chat.completions.create(
@@ -98,9 +141,12 @@ def heal_postman_collection(collection_path: str, diff: Dict[str, Any], openapi_
                     for token in response:
                         if hasattr(token, 'choices'):
                             new_content += token.choices[0].delta.content or ""
+                    logger.debug(f"Raw LLM response for request '{item.get('name', raw_path)}': {new_content}")
+                    print(f"[DEBUG] Raw LLM response for request '{item.get('name', raw_path)}':\n{new_content}\n")
                     if new_content.strip():
                         try:
-                            request = json.loads(new_content)
+                            json_str = _extract_json_from_llm_response(new_content)
+                            request = json.loads(json_str)
                             changed = True
                             actions.append({"request": item.get("name", raw_path), "action": "patched-llm"})
                         except Exception as e:

@@ -39,7 +39,7 @@ def run_newman(collection_path: str, environment_path: Optional[str] = None) -> 
     """
     Run a Postman collection using Newman and return results as a dict.
     """
-    cmd = ["newman", "run", collection_path, "--reporters", "json", "--reporter-json-export", "newman_report.json"]
+    cmd = [r"C:\Users\niranjan.c\AppData\Roaming\npm\newman.cmd", "run", collection_path, "--reporters", "json", "--reporter-json-export", "newman_report.json"]
     if environment_path:
         cmd.extend(["--environment", environment_path])
     try:

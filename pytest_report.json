@@ -1,1 +1,302 @@
-{"created": 1750845409.0172164, "duration": 0.04700303077697754, "exitcode": 5, "root": "C:\\Users\\niranjan.c\\Desktop\\healapi", "environment": {}, "summary": {"total": 0, "collected": 0}, "collectors": [{"nodeid": "", "outcome": "passed", "result": [{"nodeid": "tests", "type": "Dir"}]}, {"nodeid": "tests", "outcome": "passed", "result": []}], "tests": []}
+{
+  "api_diff": {
+    "added_endpoints": [],
+    "removed_endpoints": [
+      "/more"
+    ],
+    "changed_endpoints": [],
+    "property_changes": [
+      {
+        "path": "/hello",
+        "method": "get",
+        "added_properties": [
+          "minor"
+        ],
+        "removed_properties": [
+          "message"
+        ]
+      }
+    ]
+  },
+  "healing_actions": {
+    "healed_postman_requests": [
+      {
+        "request": "Hello Endpoint",
+        "action": "patched-llm"
+      }
+    ]
+  },
+  "test_results": {
+    "type": "newman",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "",
+    "report": {
+      "collection": {
+        "item": [
+          {
+            "id": "5cc459b4-d95f-4ec8-abfd-98514d36cc0c",
+            "name": "Hello Endpoint",
+            "request": {
+              "url": {
+                "path": [
+                  "hello"
+                ],
+                "host": [
+                  "{{apiurl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": []
+          }
+        ],
+        "event": [],
+        "variable": [],
+        "info": {
+          "_postman_id": "5d866875-cc81-49e0-9186-46c63355644b",
+          "name": "Dummy API Collection",
+          "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        }
+      },
+      "environment": {
+        "id": "eb185e66-bc91-4557-b97c-6dbad7ed7ecd",
+        "values": [
+          {
+            "type": "any",
+            "value": "http://localhost:5000",
+            "key": "apiurl"
+          }
+        ]
+      },
+      "globals": {
+        "id": "63fb07a7-6075-45ad-be93-80c43239ac33",
+        "values": []
+      },
+      "run": {
+        "stats": {
+          "iterations": {
+            "total": 1,
+            "pending": 0,
+            "failed": 0
+          },
+          "items": {
+            "total": 1,
+            "pending": 0,
+            "failed": 0
+          },
+          "scripts": {
+            "total": 0,
+            "pending": 0,
+            "failed": 0
+          },
+          "prerequests": {
+            "total": 1,
+            "pending": 0,
+            "failed": 0
+          },
+          "requests": {
+            "total": 1,
+            "pending": 0,
+            "failed": 0
+          },
+          "tests": {
+            "total": 1,
+            "pending": 0,
+            "failed": 0
+          },
+          "assertions": {
+            "total": 0,
+            "pending": 0,
+            "failed": 0
+          },
+          "testScripts": {
+            "total": 0,
+            "pending": 0,
+            "failed": 0
+          },
+          "prerequestScripts": {
+            "total": 0,
+            "pending": 0,
+            "failed": 0
+          }
+        },
+        "timings": {
+          "responseAverage": 131,
+          "responseMin": 131,
+          "responseMax": 131,
+          "responseSd": 0,
+          "dnsAverage": 0,
+          "dnsMin": 0,
+          "dnsMax": 0,
+          "dnsSd": 0,
+          "firstByteAverage": 0,
+          "firstByteMin": 0,
+          "firstByteMax": 0,
+          "firstByteSd": 0,
+          "started": 1750935713331,
+          "completed": 1750935713536
+        },
+        "executions": [
+          {
+            "cursor": {
+              "position": 0,
+              "iteration": 0,
+              "length": 1,
+              "cycles": 1,
+              "empty": false,
+              "eof": false,
+              "bof": true,
+              "cr": false,
+              "ref": "121f3ab8-efa0-4c54-bfaf-61b431c75a1f",
+              "httpRequestId": "0ca06d88-fe27-4976-8949-c46d67bcaa0a"
+            },
+            "item": {
+              "id": "5cc459b4-d95f-4ec8-abfd-98514d36cc0c",
+              "name": "Hello Endpoint",
+              "request": {
+                "url": {
+                  "path": [
+                    "hello"
+                  ],
+                  "host": [
+                    "{{apiurl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "method": "GET"
+              },
+              "response": [],
+              "event": []
+            },
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "5000",
+                "path": [
+                  "hello"
+                ],
+                "host": [
+                  "localhost"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "User-Agent",
+                  "value": "PostmanRuntime/7.39.1",
+                  "system": true
+                },
+                {
+                  "key": "Accept",
+                  "value": "*/*",
+                  "system": true
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache",
+                  "system": true
+                },
+                {
+                  "key": "Postman-Token",
+                  "value": "97d850f5-4bd7-4962-b067-a347e0b35d17",
+                  "system": true
+                },
+                {
+                  "key": "Host",
+                  "value": "localhost:5000",
+                  "system": true
+                },
+                {
+                  "key": "Accept-Encoding",
+                  "value": "gzip, deflate, br",
+                  "system": true
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive",
+                  "system": true
+                }
+              ],
+              "method": "GET"
+            },
+            "response": {
+              "id": "8468802b-dab2-4160-b264-1b682258a90a",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "Werkzeug/3.1.3 Python/3.11.9"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 26 Jun 2025 11:01:53 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "28"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                }
+              ],
+              "stream": {
+                "type": "Buffer",
+                "data": [
+                  123,
+                  34,
+                  109,
+                  101,
+                  115,
+                  115,
+                  97,
+                  103,
+                  101,
+                  34,
+                  58,
+                  34,
+                  72,
+                  101,
+                  108,
+                  108,
+                  111,
+                  44,
+                  32,
+                  119,
+                  111,
+                  114,
+                  108,
+                  100,
+                  33,
+                  34,
+                  125,
+                  10
+                ]
+              },
+              "cookie": [],
+              "responseTime": 131,
+              "responseSize": 28
+            },
+            "id": "5cc459b4-d95f-4ec8-abfd-98514d36cc0c"
+          }
+        ],
+        "transfers": {
+          "responseTotal": 28
+        },
+        "failures": [],
+        "error": null
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+[
+  {
+    "key": "apiurl",
+    "value": "http://localhost:5000",
+    "enabled": true
+  }
+]
