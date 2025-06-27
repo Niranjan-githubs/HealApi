@@ -16,6 +16,8 @@ paths:
                 properties:
                   message:
                     type: string
+                  extra:
+                    type: integer
   /more:
     post:
       summary: Returns a greeting
@@ -29,4 +31,30 @@ paths:
                 properties:
                   mee:
                     type: string
+  /error:
+    get:
+      summary: Always returns error
+      responses:
+        '200':
+          description: Should return OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+  /removed:
+    get:
+      summary: This endpoint will be removed in new spec
+      responses:
+        '200':
+          description: Removed endpoint
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gone:
+                    type: boolean
 

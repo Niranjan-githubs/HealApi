@@ -3,7 +3,7 @@ info:
   title: Dummy API
   version: 2.0.0
 paths:
-  /hello:
+  /greeting:
     get:
       summary: Returns a greeting
       responses:
@@ -16,3 +16,31 @@ paths:
                 properties:
                   minor:
                     type: string
+                  extra:
+                    type: string  # type changed from integer to string
+  /fail:
+    get:
+      summary: Always returns error
+      responses:
+        '200':
+          description: Should return OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: integer  # type changed from string to integer
+  /added:
+    get:
+      summary: This endpoint is new in the new spec
+      responses:
+        '200':
+          description: Added endpoint
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  new:
+                    type: boolean
