@@ -3,40 +3,27 @@ info:
   title: Dummy API
   version: 1.0.0
 paths:
-  /hello:
+  /greeting:
     get:
-      summary: Returns a greeting
+      summary: Greeting endpoint
       responses:
         '200':
-          description: A greeting message
+          description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  minor:
                     type: string
                   extra:
-                    type: integer
-  /more:
-    post:
-      summary: Returns a greeting
-      responses:
-        '200':
-          description: A greeting message
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  mee:
                     type: string
-  /error:
+  /fail:
     get:
-      summary: Always returns error
+      summary: Fail endpoint
       responses:
         '200':
-          description: Should return OK
+          description: OK
           content:
             application/json:
               schema:
@@ -44,17 +31,30 @@ paths:
                 properties:
                   result:
                     type: string
-  /removed:
+  /added:
     get:
-      summary: This endpoint will be removed in new spec
+      summary: Added endpoint
       responses:
         '200':
-          description: Removed endpoint
+          description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  gone:
-                    type: boolean
+                  new:
+                    type: string
+  /hello:
+    get:
+      summary: Hello endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
 

@@ -17,6 +17,8 @@ def main():
     parser.add_argument('--env-path', help='Path to Postman environment file (optional, for postman only)')
     parser.add_argument('--report-path', help='Path to save the final report (optional)')
     parser.add_argument('--llm-model', help='LLM model name for advanced healing (optional)')
+    parser.add_argument('--healed-collection-path', help='(Postman only) Path to save the healed Postman collection (optional)')
+    parser.add_argument('--llm-key-var', default='TOGETHER_API_KEY', help='Environment variable for LLM API key (optional, default: TOGETHER_API_KEY)')
     args = parser.parse_args()
 
     # Typo linting step before diff
@@ -57,7 +59,9 @@ def main():
 
     try:
         print("[3/5] Healing affected tests...")
-        healing = healing_engine.heal_tests(args.test_type, args.test_path, affected, diff, new_spec, args.llm_model)
+        healing = healing_engine.heal_tests(
+            args.test_type, args.test_path, affected, diff, new_spec, args.llm_model, args.llm_key_var
+        )
         print(json.dumps(healing, indent=2))
     except Exception as e:
         logger.error(f"Failed during healing: {e}")

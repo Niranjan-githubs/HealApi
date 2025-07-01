@@ -40,11 +40,20 @@ def run_newman(collection_path: str, environment_path: Optional[str] = None) -> 
     """
     Run a Postman collection using Newman and return results as a dict.
     """
-    cmd = [r"C:\Users\niranjan.c\AppData\Roaming\npm\newman.cmd", "run", collection_path, "--reporters", "json", "--reporter-json-export", "newman_report.json"]
+    newman_path = os.environ.get('NEWMAN_PATH', r'C:\Users\niran\AppData\Roaming\npm\newman.cmd')
+    is_cmd = newman_path.lower().endswith('.cmd')
+    cmd_list = [newman_path, "run", collection_path, "--reporters", "json", "--reporter-json-export", "newman_report.json"]
     if environment_path:
-        cmd.extend(["--environment", environment_path])
+        cmd_list.extend(["--environment", environment_path])
+    if is_cmd:
+        # Use cmd.exe /c to run the .cmd file
+        cmd = ['cmd.exe', '/c'] + cmd_list
+        shell = False
+    else:
+        cmd = cmd_list
+        shell = False
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, shell=shell)
         report_path = "newman_report.json"
         if os.path.exists(report_path):
             with open(report_path, "r") as f:

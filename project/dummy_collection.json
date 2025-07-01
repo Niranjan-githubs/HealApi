@@ -1,46 +1,14 @@
 {
   "info": {
+    "_postman_id": "demo-id",
     "name": "Dummy API Collection",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "GET /greeting",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{apiurl}}/greeting",
-          "host": [
-            "{{apiurl}}"
-          ],
-          "path": [
-            "greeting"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Response has expected properties\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData).to.have.property('minor');",
-              "    pm.expect(jsonData).to.have.property('extra');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "response": []
-    },
-    {
       "name": "GET /fail",
       "request": {
         "method": "GET",
-        "header": [],
         "url": {
           "raw": "{{apiurl}}/fail",
           "host": [
@@ -59,19 +27,17 @@
             "exec": [
               "pm.test(\"Response has expected properties\", function () {",
               "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData).to.have.property('result');",
+              "    pm.expect(jsonData).to.have.property('status');",
               "});"
             ]
           }
         }
-      ],
-      "response": []
+      ]
     },
     {
       "name": "GET /added",
       "request": {
         "method": "GET",
-        "header": [],
         "url": {
           "raw": "{{apiurl}}/added",
           "host": [
@@ -95,102 +61,7 @@
             ]
           }
         }
-      ],
-      "response": []
-    },
-    {
-      "name": "GET /greeting",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{apiurl}}/greeting",
-          "host": [
-            "{{apiurl}}"
-          ],
-          "path": [
-            "greeting"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Response has expected properties\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData).to.have.property('minor');",
-              "    pm.expect(jsonData).to.have.property('extra');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "response": []
-    },
-    {
-      "name": "GET /fail",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{apiurl}}/fail",
-          "host": [
-            "{{apiurl}}"
-          ],
-          "path": [
-            "fail"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Response has expected properties\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData).to.have.property('result');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "response": []
-    },
-    {
-      "name": "GET /added",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{apiurl}}/added",
-          "host": [
-            "{{apiurl}}"
-          ],
-          "path": [
-            "added"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Response has expected properties\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData).to.have.property('new');",
-              "});"
-            ]
-          }
-        }
-      ],
-      "response": []
+      ]
     }
   ]
 }

@@ -1,36 +1,6 @@
- python main.py --old-spec project/old_openapi.yaml --new-spec project/new_openapi.yaml --test-type postman 
---test-path project/dummy_collection.json --env-path project/dummy_env.json --report-path pytest_report.json 
-
-
-
-pip install -e .
-
-python -m healapi.cli --wizard
-
-healapi --old-spec old_openapi.yaml --new-spec new_openapi.yaml --test-type postman --test-path your_collection.json --report-path healapi_report.json
-
-
-checking without healapi cmd :
-newman run project/dummy_collection.json --env-var "baseUrl=http://your-api" --reporters cli
-
-
-
-healed cmd :
-
-healapi --old-spec project/old_openapi.yaml --new-spec project/new_openapi.yaml --test-type postman --test-path project/dummy_collection.json --healed-collection-path project/healed_collection.json --report-path healapi_report.json
+ python -m healapi.cli --old-spec C:\Users\niran\Desktop\healapi\project\old_openapi.yaml --new-spec C:\Users\niran\Desktop\healapi\project\new_openapi.yaml --test-type postman --test-path C:\Users\niran\Desktop\healapi\project\dummy_collection.json --env-path C:\Users\niran\Desktop\healapi\project\dummy_env.json --report-path C:\Users\niran\Desktop\healapi\healapi_report.json    
 
 
 
 
-ere is the proper command to run your Postman collection with the correct API URL variable set (replace localhost:5000 with your actual API host and port):
-
-newman run project/dummy_collection.json --env-var "apiurl=localhost:5000" --reporters cli
-
-
-
-If you want to run HealAPI and generate a healed collection:
-healapi --old-spec project/old_openapi.yaml --new-spec project/new_openapi.yaml --test-type postman --test-path project/dummy_collection.json --healed-collection-path project/healed_collection.json --report-path healapi_report.json
-
-
-Then, to run the healed collection:
-newman run project/healed_collection.json --env-var "apiurl=localhost:5000" --reporters cli
+ newman run project/dummy_collection.json --environment project/dummy_env.json                             

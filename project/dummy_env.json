@@ -1,7 +1,10 @@
-[
-  {
-    "key": "apiurl",
-    "value": "http://localhost:5000",
-    "enabled": true
-  }
-]
+{
+  "id": "dummy-env-id",
+  "name": "dummy_env",
+  "values": [
+    {
+      "key": "apiurl",
+      "value": "http://localhost:5000",
+      "enabled": true
+    }]
+}

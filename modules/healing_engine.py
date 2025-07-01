@@ -14,10 +14,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Set Together API key and default model if not already set
-def _ensure_together_api_key_and_model(openai_model: Optional[str]) -> str:
-    if not os.environ.get("TOGETHER_API_KEY"):
-        logger.error("TOGETHER_API_KEY not set. Please create a .env file with TOGETHER_API_KEY=your-key or set it in your environment.")
-        raise RuntimeError("TOGETHER_API_KEY not set. Please create a .env file with TOGETHER_API_KEY=your-key or set it in your environment.")
+def _ensure_together_api_key_and_model(openai_model: Optional[str], llm_key_var: str = "TOGETHER_API_KEY") -> str:
+    if not os.environ.get(llm_key_var):
+        logger.error(f"{llm_key_var} not set. Please create a .env file with {llm_key_var}=your-key or set it in your environment.")
+        raise RuntimeError(f"{llm_key_var} not set. Please create a .env file with {llm_key_var}=your-key or set it in your environment.")
     if not openai_model:
         openai_model = "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
         logger.info("Set Together model to meta-llama/Llama-3.3-70B-Instruct-Turbo-Free by default.")
@@ -37,13 +37,13 @@ def _extract_json_from_llm_response(response_text: str) -> str:
         return match.group(1).strip()
     return response_text.strip()
 
-def heal_pytest_files(affected_files: List[str], diff: Dict[str, Any], openapi_new: Dict[str, Any], openai_model: Optional[str] = None) -> Dict[str, Any]:
+def heal_pytest_files(affected_files: List[str], diff: Dict[str, Any], openapi_new: Dict[str, Any], openai_model: Optional[str] = None, llm_key_var: str = "TOGETHER_API_KEY") -> Dict[str, Any]:
     """
     Attempt to auto-fix pytest files based on API diff.
     Uses LLM (Together API) if simple rules can't fix.
     Returns a dict with healing actions.
     """
-    openai_model = _ensure_together_api_key_and_model(openai_model)
+    openai_model = _ensure_together_api_key_and_model(openai_model, llm_key_var)
     actions = []
     for file_path in affected_files:
         try:
@@ -91,13 +91,13 @@ def heal_pytest_files(affected_files: List[str], diff: Dict[str, Any], openapi_n
             actions.append({"file": file_path, "action": "error", "error": str(e)})
     return {"healed_pytest_files": actions}
 
-def heal_postman_collection(collection_path: str, diff: Dict[str, Any], openapi_new: Dict[str, Any], openai_model: Optional[str] = None) -> Dict[str, Any]:
+def heal_postman_collection(collection_path: str, diff: Dict[str, Any], openapi_new: Dict[str, Any], openai_model: Optional[str] = None, llm_key_var: str = "TOGETHER_API_KEY") -> Dict[str, Any]:
     """
     Attempt to auto-fix Postman collection based on API diff.
     Uses LLM (Together API) if simple rules can't fix.
     Returns a dict with healing actions.
     """
-    openai_model = _ensure_together_api_key_and_model(openai_model)
+    openai_model = _ensure_together_api_key_and_model(openai_model, llm_key_var)
     actions = []
     changed = False
     try:
@@ -164,14 +164,14 @@ def heal_postman_collection(collection_path: str, diff: Dict[str, Any], openapi_
         actions.append({"collection": collection_path, "action": "error", "error": str(e)})
     return {"healed_postman_requests": actions}
 
-def heal_tests(test_type: str, test_path: str, affected: List[str], diff: Dict[str, Any], openapi_new: Dict[str, Any], openai_model: Optional[str] = None) -> Dict[str, Any]:
+def heal_tests(test_type: str, test_path: str, affected: List[str], diff: Dict[str, Any], openapi_new: Dict[str, Any], openai_model: Optional[str] = None, llm_key_var: str = "TOGETHER_API_KEY") -> Dict[str, Any]:
     """
     Heal tests based on type and return healing actions.
     """
     if test_type == "pytest":
-        return heal_pytest_files(affected, diff, openapi_new, openai_model)
+        return heal_pytest_files(affected, diff, openapi_new, openai_model, llm_key_var)
     elif test_type == "postman":
-        return heal_postman_collection(test_path, diff, openapi_new, openai_model)
+        return heal_postman_collection(test_path, diff, openapi_new, openai_model, llm_key_var)
     else:
         logger.error(f"Unknown test type: {test_type}")
         raise ValueError(f"Unknown test type: {test_type}")

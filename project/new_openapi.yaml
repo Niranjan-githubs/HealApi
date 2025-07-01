@@ -3,12 +3,12 @@ info:
   title: Dummy API
   version: 2.0.0
 paths:
-  /greeting:
+  /welcome:
     get:
-      summary: Returns a greeting
+      summary: Welcome endpoint (renamed from /greeting)
       responses:
         '200':
-          description: A greeting message
+          description: OK
           content:
             application/json:
               schema:
@@ -17,30 +17,43 @@ paths:
                   minor:
                     type: string
                   extra:
-                    type: string  # type changed from integer to string
+                    type: string
   /fail:
     get:
-      summary: Always returns error
+      summary: Fail endpoint (property changed)
       responses:
         '200':
-          description: Should return OK
+          description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  result:
-                    type: integer  # type changed from string to integer
+                  status:
+                    type: string
   /added:
     get:
-      summary: This endpoint is new in the new spec
+      summary: Added endpoint
       responses:
         '200':
-          description: Added endpoint
+          description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   new:
-                    type: boolean
+                    type: string
+  /salute:
+    get:
+      summary: Salute endpoint (renamed from /hello)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string

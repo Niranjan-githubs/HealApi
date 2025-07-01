@@ -4,6 +4,7 @@ fuzzywuzzy
 requests
 pytest
 python-dotenv
+astor
+flask 
+together
 
-
-python main.py --old-spec old_openapi.yaml --new-spec new_openapi.yaml --test-type postman --test-path realworld/api/Conduit.postman_collection.json

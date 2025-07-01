@@ -2,6 +2,7 @@ import argparse
 import logging
 import json
 from healapi import diff_engine, test_analyzer, healing_engine, test_runner, report_generator, openapi_typo_linter
+from typing import Optional
 
 def main():
     parser = argparse.ArgumentParser(description="HealAPI: Self-Healing API Test Automation System")
@@ -13,6 +14,7 @@ def main():
     parser.add_argument('--report-path', help='Path to save the final report (optional)')
     parser.add_argument('--llm-model', help='LLM model name for advanced healing (optional)')
     parser.add_argument('--healed-collection-path', help='(Postman only) Path to save the healed Postman collection (optional)')
+    parser.add_argument('--llm-key-var', help='Environment variable for LLM API key (optional, default: TOGETHER_API_KEY)', default='TOGETHER_API_KEY')
     args = parser.parse_args()
 
     # Typo linting step before diff
@@ -59,7 +61,7 @@ def main():
             )
         else:
             healing = healing_engine.heal_tests(
-                args.test_type, args.test_path, affected, diff, new_spec, args.llm_model
+                args.test_type, args.test_path, affected, diff, new_spec, args.llm_model, args.llm_key_var
             )
         print(json.dumps(healing, indent=2))
     except Exception as e:
